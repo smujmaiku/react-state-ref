@@ -1,17 +1,11 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-    ],
     "esModuleInterop": true,
     "target": "es2017",
     "module": "commonjs",
-    "strict": true,
-    "jsx": "react",
     "declaration": true,
-    "outDir": "./lib",
-    "resolveJsonModule": true,
+    "jsx": "react",
+    "outDir": "./lib"
   },
   "include": [
     "./src"
