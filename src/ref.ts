@@ -5,29 +5,31 @@
  */
 
 import {
-	useRef, useCallback, useState, MutableRefObject
+	useRef, useCallback, MutableRefObject, useMemo, useReducer
 } from 'react';
 
 export type SetStateRef<T> = (state: T, swap?: boolean) => void;
 export type UseStateRef<T> = [ref: MutableRefObject<T>, setState: SetStateRef<T>];
 
 export default function useStateRef<T>(init: T): UseStateRef<T> {
-	const a = useRef(init);
-	const b = useRef(init);
-	const [active, setActive] = useState(true);
+	const stateRef = useRef<T>(init);
 
-	// Use activeRef to avoid swapping too fast and missing an update cycle
-	const activeRef = useRef(active);
-	activeRef.current = active;
+	const [refresh, doRefresh] = useReducer((s) => s + 1, 0);
 
-	const setState = useCallback((state: T, swap = false): void => {
-		a.current = state;
-		b.current = state;
+	const ref = useMemo<MutableRefObject<T>>(
+		() => ({ current: stateRef.current }),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[refresh],
+	);
+
+	const setStateRef = useCallback((state: T, swap = false): void => {
+		stateRef.current = state;
 		if (swap) {
-			setActive(!activeRef.current);
+			doRefresh();
 		}
-	}, []);
+	}, [doRefresh]);
 
-	const ref = active ? a : b;
-	return [ref, setState];
+	ref.current = stateRef.current;
+
+	return [ref, setStateRef];
 }
